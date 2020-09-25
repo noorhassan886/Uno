@@ -5,11 +5,11 @@ import java.net.Socket;
 
 public class SocketWrapper {
 
-    //raw socket connection
+    // raw socket connection
     private Socket connection;
-    //Stream sending data to the other end
+    // stream sending data to the other end
     private BufferedWriter out;
-    // Stream receiving data from the other end
+    // stream receiving data from the other end
     private BufferedReader in;
 
     // constructor

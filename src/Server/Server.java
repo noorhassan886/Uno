@@ -9,15 +9,21 @@ import java.util.Queue;
 
 public class Server {
 
-    //Lobbies that out players wait in
+    // lobbies that out players wait in
     public static final Queue<SocketWrapper>twoPlayerLobby = new LinkedList<>();
     public static final Queue<SocketWrapper>fourPlayerLobby = new LinkedList<>();
 
     public static void main(String[] args) {
 
-        //opening a server for client connections
+        // opening a server for client connections
         final int SERVER_PORT = 5000;
         try(ServerSocket server = new ServerSocket(SERVER_PORT)) {
+
+            // make bouncers watch the lobbies for new players
+            Bouncer twoPlayer = new Bouncer(twoPlayerLobby, 2);
+            Bouncer fourPlayer = new Bouncer(fourPlayerLobby, 4);
+            twoPlayer.start();
+            fourPlayer.start();
 
             // wait for clients to connect
             while (true) {

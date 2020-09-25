@@ -5,13 +5,25 @@ import common.SocketWrapper;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
-public class Bouncer {
+public class Bouncer extends Thread {
 
-    // When to release people to a game
+    // when to release people to a game
     private final Semaphore people = new Semaphore(0);
-    //The queue that it is watching
+
+    // the queue that it is watching
     private Queue<SocketWrapper> queue;
-    //Number of people
+
+    // number of people
     private int lobbySize;
 
+    // constructor
+    public Bouncer(Queue<SocketWrapper> queue, int gameSize) {
+        this.queue = queue;
+        this.lobbySize = gameSize;
+    }
+
+    @Override
+    public void run() {
+        System.out.println("Bouncer is waiting for " + lobbySize + "-player lobbies");
+    }
 }
