@@ -28,10 +28,13 @@ public class Server {
             // wait for clients to connect
             while (true) {
                 SocketWrapper client = new SocketWrapper(server.accept());
-                if (true) {
+                String gameMode = client.read();
+                if (gameMode.equals("two")) {
+                    System.out.println("New 2 player");
                     twoPlayerLobby.add(client);
                 }
                 else {
+                    System.out.println("New 4 player");
                     fourPlayerLobby.add(client);
                 }
             }
