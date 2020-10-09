@@ -18,15 +18,6 @@ public class Client {
                 new GameWidow(new Dimension(1200, 720));
             }
         });
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Do you want to play in a two-player or four-player lobby?");
-        String mode = scanner.nextLine();
-
-        Socket clientSocket = new Socket("localhost", 5000);
-        SocketWrapper client = new SocketWrapper(clientSocket);
-        client.send(mode);
-
     }
 
 
