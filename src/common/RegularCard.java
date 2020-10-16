@@ -8,5 +8,13 @@ public class RegularCard extends UnoCard {
         super(startingColor);
         this.number = startingNumber;
     }
+    @Override
+    public String toString() {
+        String s = "";
+        s += this.color;
+        s += " ";
+        s += this.number;
+        return s;
+    }
 
 }

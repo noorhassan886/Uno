@@ -7,4 +7,12 @@ public class ColoredSpecialcard extends SpecialCard {
 
     }
 
+    @Override
+    public String toString() {
+        String s = "";
+        s += this.color;
+        s += " ";
+        s += this.type;
+        return s;
+    }
 }

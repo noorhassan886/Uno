@@ -37,6 +37,9 @@ public class Server {
                     System.out.println("New 4 player");
                     fourPlayerLobby.add(client);
                 }
+
+                // Debugging
+                UnoGameThread thread = new UnoGameThread();
             }
 
                 //TODO: show them a menu for 2 4 player lobby
