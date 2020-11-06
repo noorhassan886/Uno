@@ -32,20 +32,15 @@ public class Server {
                 if (gameMode.equals("two")) {
                     System.out.println("New 2 player");
                     twoPlayerLobby.add(client);
+                    twoPlayer.release();
                 }
                 else {
                     System.out.println("New 4 player");
                     fourPlayerLobby.add(client);
+                    fourPlayer.release();
                 }
 
-                // Debugging
-                UnoGameThread thread = new UnoGameThread();
             }
-
-                //TODO: show them a menu for 2 4 player lobby
-                //TODO: get their response
-                //TODO: put them into matching lobby
-                //TODO: run that lobby's game on another thread
 
         } catch (Exception e) {
             e.printStackTrace();

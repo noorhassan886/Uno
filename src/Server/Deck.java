@@ -58,4 +58,39 @@ public class Deck {
         return this.cards.pop();
     }
 
+    public int getNumCards() {
+        return this.cards.size();
+    }
+
+    public void reset(Deck discardPile) {
+        // Remove card from the discard pile
+        Stack<UnoCard> discardStack = discardPile.cards;
+        UnoCard[] discardCards = new UnoCard[discardStack.size()];
+        for (int i = 0; i < discardCards.length; i++)
+            discardCards[i] = discardStack.pop();
+
+        // Shuffle cards
+        List<UnoCard> list = Arrays.asList(discardCards);
+        Collections.shuffle(list);
+
+        // Remove cards already in the stack
+        UnoCard[] leftoverCards = new UnoCard[this.cards.size()];
+        for (int i = 0; i < leftoverCards.length; i++)
+            leftoverCards[i] = this.cards.pop();
+
+        // Put discard cards back in the stack
+        this.cards.addAll(list);
+
+        // Add the originals back in the order they were in originally
+        this.cards.addAll(Arrays.asList(leftoverCards));
+    }
+
+    public UnoCard getCard() {
+        return this.cards.peek();
+    }
+
+    public void addCard(UnoCard newCard) {
+        this.cards.push(newCard);
+    }
+
 }

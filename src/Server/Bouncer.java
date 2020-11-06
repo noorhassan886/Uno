@@ -1,6 +1,7 @@
 package Server;
 
 import common.SocketWrapper;
+import common.UnoCard;
 
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
@@ -22,8 +23,33 @@ public class Bouncer extends Thread {
         this.lobbySize = gameSize;
     }
 
+    public void release() {
+        this.people.release();
+    }
+
     @Override
     public void run() {
         System.out.println("Bouncer is waiting for " + lobbySize + "-player lobbies");
+
+        while (true) {
+
+            // Wait for enough people
+            try {
+                this.people.acquire(lobbySize);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Create a new game
+            UnoGameThread thread;
+            if (this.lobbySize == 2)
+                thread = new UnoGameThread(this.queue.remove(), this.queue.remove());
+            else
+                thread = new UnoGameThread(this.queue.remove(), this.queue.remove(),
+                         this.queue.remove(), this.queue.remove() );
+            thread.start();
+        }
+
     }
+
 }
