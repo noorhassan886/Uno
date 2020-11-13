@@ -1,9 +1,13 @@
 package Server;
 
+import common.PlayerEvent;
 import common.PlayerHand;
 import common.SocketWrapper;
 import common.SpecialCard;
-import common.WildCard;
+
+import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class UnoGameThread extends Thread{
 
@@ -42,18 +46,40 @@ public class UnoGameThread extends Thread{
             }
         }
 
-        // pick a card for the discard pile to start with
+        // Pick a card for the discard pile to start with
         while (this.discardPile.getNumCards() == 0|| this.discardPile.getCard() instanceof SpecialCard) {
             // taking a card from the draw pile and putting it on the discard pile
             this.discardPile.addCard(this.drawFrom.drawCard());
         }
 
-        // TODO: tell the players what their hand it
+        // Tell the players what their hand and top card is
         for (int i = 0; i < this.players.length; i++) {
-            players[i].send(hands[i].toString());
+            try {
+                players[i].send("NEW_HAND//" + hands[i].toString());
+                players[i].send ("TOP_CARD//" + this.discardPile.getCard().toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        // TODO: player turn starts
+        //  Begin listening to players
+        final BlockingQueue<PlayerEvent> messageQueue = new LinkedBlockingQueue<>();
+        final PlayerListeningThread[] listeningThreads = new PlayerListeningThread[this.players.length];
+        for (int i = 0; i < listeningThreads.length; i++) {
+            listeningThreads[i] = new PlayerListeningThread(messageQueue, this.player[i], i);
+            listeningThreads[i].start();
+        }
+
+        while (true /* as long as the game is going */) {
+            PlayerEvent event = messageQueue.take();
+            if (event.getAction().equals("Place Card")) {
+
+            }
+            else if (event.getAction().equals("UNO")) {
+
+            }
+        }
+
     }
 
 }
