@@ -12,5 +12,17 @@ public abstract class UnoCard {
         return color;
     }
 
+    public static UnoCard fromString(String card) {
+        if() {
+            RegularCard
+        }
+        if() {
+            ColoredSpecialcard
+        }
+        if() {
+            WildCard
+        }
+    }
+
 }
 

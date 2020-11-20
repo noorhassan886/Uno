@@ -1,9 +1,6 @@
 package Server;
 
-import common.PlayerEvent;
-import common.PlayerHand;
-import common.SocketWrapper;
-import common.SpecialCard;
+import common.*;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
@@ -66,18 +63,50 @@ public class UnoGameThread extends Thread{
         final BlockingQueue<PlayerEvent> messageQueue = new LinkedBlockingQueue<>();
         final PlayerListeningThread[] listeningThreads = new PlayerListeningThread[this.players.length];
         for (int i = 0; i < listeningThreads.length; i++) {
-            listeningThreads[i] = new PlayerListeningThread(messageQueue, this.player[i], i);
+            listeningThreads[i] = new PlayerListeningThread(messageQueue, this.players[i], i);
             listeningThreads[i].start();
         }
 
+        // Game state variables
+        int playerTurn = 0;
+        String direction = "cw";
+
+
         while (true /* as long as the game is going */) {
-            PlayerEvent event = messageQueue.take();
-            if (event.getAction().equals("Place Card")) {
+            PlayerEvent event = null;
+            try {
+                event = messageQueue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            /*
+            TODO:
+                place a card
+                draw a card
+                call uno
+             */
+
+            // If someone is trying to place a card
+            if(event.getAction().equals("PLACE_CARD")) {
+                // If its the correct players turn
+                if(event.getId() == playerTurn) {
+                 /*
+                TODO:
+                    2. get their card of choice from the event playload
+                    3. validation
+                    4. place card on pile
+                    5. propagate effects onto next player
+                 */
+                    String card = event.getPayload();
+                    // Convert "card" to an Uno Card
+                    UnoCard convertedCard = UnoCard.fromString(card);
+
+                }
 
             }
-            else if (event.getAction().equals("UNO")) {
 
-            }
         }
 
     }
