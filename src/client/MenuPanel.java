@@ -13,7 +13,7 @@ public class MenuPanel extends JPanel {
 
     private JButton twoPlayerBtn, fourPlayerBtn, optionsBtn, quitBtn;
 
-    MenuPanel() {
+    MenuPanel(ActionListener moveToGamePanel) {
         setLayout(new GridBagLayout());
 
         this.twoPlayerBtn = new JButton("Join 2-Player lobby");
@@ -30,6 +30,7 @@ public class MenuPanel extends JPanel {
                 }
             }
         });
+        this.twoPlayerBtn.addActionListener(moveToGamePanel);
 
         this.fourPlayerBtn = new JButton("Join 4-Player lobby");
         this.fourPlayerBtn.setPreferredSize(new Dimension(150, 50));

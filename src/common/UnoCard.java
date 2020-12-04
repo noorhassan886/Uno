@@ -13,15 +13,17 @@ public abstract class UnoCard {
     }
 
     public static UnoCard fromString(String card) {
-        if() {
-            RegularCard
-        }
-        if() {
-            ColoredSpecialcard
-        }
-        if() {
-            WildCard
-        }
+//        TODO: do this
+//        if() {
+//            RegularCard
+//        }
+//        if() {
+//            ColoredSpecialcard
+//        }
+//        if() {
+//            WildCard
+//        }
+        return null;
     }
 
 }

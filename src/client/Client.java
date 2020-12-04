@@ -1,12 +1,8 @@
 package client;
 
-import common.SocketWrapper;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.net.Socket;
-import java.util.Scanner;
 
 public class Client {
 
