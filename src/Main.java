@@ -1,3 +1,7 @@
+import common.UnoCard;
+
+import java.io.IOException;
+
 public class Main {
     public static void main(String[] args) {
         /*
@@ -11,5 +15,12 @@ public class Main {
         need a way for players to call uno
         support 2 or 4 player lobbies
          */
+
+        try {
+            UnoCard.loadCardImage();
+        } catch (IOException e) {
+            System.out.println("Image failed to load: " + e.getMessage());
+        }
     }
 }
+
