@@ -27,6 +27,7 @@ public class SocketWrapper {
         for (int i = 0; i < 4 - messageLength.length(); i++) {
             padding += "0" ;
         }
+
         //Send the message length
         this.out.write(padding + messageLength);
         //Send the message itself

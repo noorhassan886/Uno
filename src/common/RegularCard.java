@@ -17,4 +17,8 @@ public class RegularCard extends UnoCard {
         return s;
     }
 
+    @Override
+    public String getInfo() {
+        return String.valueOf(this.number);
+    }
 }

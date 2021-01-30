@@ -93,4 +93,22 @@ public class Deck {
         this.cards.push(newCard);
     }
 
+    public boolean canPlaceCard(UnoCard newCard) {
+
+        // every card compatible if the pile is empty
+        if(this.getNumCards() == 0)
+            return true;
+
+        // wild cards are always compatible
+        if(newCard instanceof WildCard)
+            return true;
+
+        // find the top card
+        UnoCard topCard = this.getCard();
+
+        // compatible if same color or same number/type
+        return topCard.getColor().equals(newCard.getColor()) ||
+                topCard.getInfo().equals(newCard.getInfo());
+    }
+
 }

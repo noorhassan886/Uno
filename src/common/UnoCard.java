@@ -78,5 +78,7 @@ public abstract class UnoCard {
 
     }
 
+    public abstract String getInfo();
+
 }
 

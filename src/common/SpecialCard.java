@@ -9,6 +9,9 @@ public abstract class SpecialCard extends UnoCard {
         this.type = startingType;
     }
 
-
+    @Override
+    public String getInfo() {
+        return this.type;
+    }
 
 }

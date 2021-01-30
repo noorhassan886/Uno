@@ -53,7 +53,7 @@ public class UnoGameThread extends Thread{
         for (int i = 0; i < this.players.length; i++) {
             try {
                 players[i].send("NEW_HAND//" + hands[i].toString());
-                players[i].send ("TOP_CARD//" + this.discardPile.getCard().toString());
+                players[i].send("TOP_CARD//" + this.discardPile.getCard().toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -97,11 +97,46 @@ public class UnoGameThread extends Thread{
                     2. get their card of choice from the event playload
                     3. validation
                     4. place card on pile
-                    5. propagate effects onto next player
+                    5. Notify each player the card was placed
+                    6. propagate effects onto next player
                  */
+
                     String card = event.getPayload();
                     // Convert "card" to an Uno Card
                     UnoCard convertedCard = UnoCard.fromString(card);
+
+                    // Validate if card can be placed
+                    boolean canBePlaced = discardPile.canPlaceCard(convertedCard);
+
+                    if (canBePlaced) {
+                        // Put the card on the discard pile
+                        discardPile.addCard(convertedCard);
+                        // tell all players abt new top card
+                        for (SocketWrapper player : players) {
+                            try {
+                                player.send("TOP_CARD//" + this.discardPile.getCard().toString());
+                            } catch (IOException e) {
+                                System.out.println("Error sending new top card: " + e.getMessage());
+                                ;
+                            }
+
+                        }
+                        // Handle effects of cards
+                        if(convertedCard.getInfo().equals("Skip"))
+                            playerTurn += direction.equals("cw") ? 1: -1;
+
+                    }
+//                    reverse;
+//                    +2;
+//                    +4;
+//                    wild color picking;
+
+                    // Increment current players turn
+                    if(direction.equals("cw")) {
+                        playerTurn = (playerTurn + 1) % players.length;
+                    } else {
+                        playerTurn = (playerTurn - 1) % players.length;
+                    }
 
                 }
 
