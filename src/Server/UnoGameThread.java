@@ -70,6 +70,7 @@ public class UnoGameThread extends Thread{
         // Game state variables
         int playerTurn = 0;
         String direction = "cw";
+        int drawCardStack = 0;
 
 
         while (true /* as long as the game is going */) {
@@ -106,11 +107,15 @@ public class UnoGameThread extends Thread{
                     UnoCard convertedCard = UnoCard.fromString(card);
 
                     // Validate if card can be placed
+                    // TODO: Make one card validation method for
+                    //  base Uno Compatibility and special card stacking rules
                     boolean canBePlaced = discardPile.canPlaceCard(convertedCard);
+                    // canBePlaced = canBePlaced && canBePlaced(discardPile.getCard(), convertedCard);
 
                     if (canBePlaced) {
                         // Put the card on the discard pile
                         discardPile.addCard(convertedCard);
+                        // remove from player hand
                         // tell all players abt new top card
                         for (SocketWrapper player : players) {
                             try {
@@ -126,8 +131,20 @@ public class UnoGameThread extends Thread{
                             playerTurn += direction.equals("cw") ? 1: -1;
 
                     }
-//                    reverse;
-//                    +2;
+                    else if(convertedCard.getInfo().equals("Reverse")) {
+                        // Reverse direction for 4 player game
+                        if (players.length == 4)
+                            direction = direction.equals("cw") ? "ccw": "cw";
+
+                        // Do nothing for two player game
+                    }
+                    else if (convertedCard.getInfo().equals("+2")) {
+                        drawCardStack += 2;
+                    }
+                    else if (convertedCard.getInfo().equals("+4")) {
+                        drawCardStack += 4;
+                    }
+
 //                    +4;
 //                    wild color picking;
 
@@ -138,12 +155,47 @@ public class UnoGameThread extends Thread{
                         playerTurn = (playerTurn - 1) % players.length;
                     }
 
+                    // Handing stacking cards
+                    if (drawCardStack > 0) {
+                        // TODO: ensure it knows the diff between +2 and +4 stacks
+                        if (!hands[playerTurn].toString().contains("+2")) {
+                            // add to the servers copy
+                            for (int i = 0; i < drawCardStack; i++) {
+                                addCardTwoPlayer(drawCardFromDeck(), playerTurn);
+                            }
+                        }
+
+                        // Reset num of cards that needs to be drawn
+                        drawCardStack = 0;
+
+                    }
+
                 }
 
             }
 
         }
 
+    }
+
+    private void addCardTwoPlayer(UnoCard card, int playerTurn) {
+        // Add card to server copy of hand
+        hands[playerTurn].addCard(card);
+        // Tell player their new hand
+        try {
+            players[playerTurn].send("NEW_HAND//" + hands[playerTurn].toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // TODO: tell all players of number of cards of this player
+    }
+
+    private UnoCard drawCardFromDeck() {
+        // Reset if necessary
+        if(drawFrom.getNumCards() == 0)
+            drawFrom.reset(discardPile);
+        // Draw a card and return
+        return drawFrom.drawCard();
     }
 
 }
