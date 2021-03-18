@@ -80,5 +80,13 @@ public abstract class UnoCard {
 
     public abstract String getInfo();
 
+    public boolean equals (Object other) {
+        if (other == null) return false;
+        if(!(other instanceof UnoCard)) return false;
+
+        UnoCard card = (UnoCard) other;
+        return this.getInfo().equals(card.getInfo()) && this.getColor().equals(card.getColor());
+    }
+
 }
 

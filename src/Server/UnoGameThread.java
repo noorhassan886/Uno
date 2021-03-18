@@ -36,6 +36,7 @@ public class UnoGameThread extends Thread{
 
     @Override
     public void run() {
+        System.out.println("Starting new two player game");
         // Deal 7 cards per player
         for (PlayerHand hand : this.hands) {
             for (int i = 0; i < 7; i++) {
@@ -50,6 +51,7 @@ public class UnoGameThread extends Thread{
         }
 
         // Tell the players what their hand and top card is
+        System.out.println("Sending players their opening hand");
         for (int i = 0; i < this.players.length; i++) {
             try {
                 players[i].send("NEW_HAND//" + hands[i].toString());
@@ -109,8 +111,9 @@ public class UnoGameThread extends Thread{
                     // Validate if card can be placed
                     // TODO: Make one card validation method for
                     //  base Uno Compatibility and special card stacking rules
-                    boolean canBePlaced = discardPile.canPlaceCard(convertedCard);
-                    // canBePlaced = canBePlaced && canBePlaced(discardPile.getCard(), convertedCard);
+
+                    boolean canBePlaced = canPlaceCard(convertedCard, hands[event.getId()]);
+
 
                     if (canBePlaced) {
                         // Put the card on the discard pile
@@ -198,4 +201,32 @@ public class UnoGameThread extends Thread{
         return drawFrom.drawCard();
     }
 
+    private boolean canPlaceCard(UnoCard currentCard, PlayerHand hand) {
+        boolean canBePlaced = discardPile.canPlaceCard(currentCard);
+        if (!canBePlaced) return false;
+
+        // TODO: validate that they can place +2 on +2; +4 on +4; skip/reverse
+        UnoCard match = null;
+
+        for (UnoCard card : hand.getCards()) {
+            // If the type matches (+2, +4, number, Skip, etc.)
+            if (card.getInfo().equals(discardPile.getCard().getClass())) {
+                // Special case for duplicate regular cards where we need color to match as well
+                if (card instanceof RegularCard && card.getColor().equals(discardPile.getCard().getColor())) {
+                    match = card;
+                } else if (!(card instanceof RegularCard)) {
+                    match = card;
+                }
+            }
+        }
+
+        if (match == null) {
+            return true;
+        }
+        else if (match instanceof SpecialCard){
+            return match.getInfo().equals(currentCard.getInfo());
+        } else {
+            return match.equals(currentCard);
+        }
+    }
 }

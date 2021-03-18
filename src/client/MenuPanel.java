@@ -22,15 +22,14 @@ public class MenuPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Socket clientSocket = new Socket("localhost", 5000);
-                    SocketWrapper client = new SocketWrapper(clientSocket);
-                    client.send("two");
+                    ConnectionThread.makeServerConnection().send("two");
+                    moveToGamePanel.actionPerformed(e);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         });
-        this.twoPlayerBtn.addActionListener(moveToGamePanel);
+        // this.twoPlayerBtn.addActionListener(moveToGamePanel);
 
         this.fourPlayerBtn = new JButton("Join 4-Player lobby");
         this.fourPlayerBtn.setPreferredSize(new Dimension(150, 50));
@@ -38,9 +37,7 @@ public class MenuPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Socket clientSocket = new Socket("localhost", 5000);
-                    SocketWrapper client = new SocketWrapper(clientSocket);
-                    client.send("four");
+                    ConnectionThread.getSocketWrapper().send("four");
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -60,7 +57,7 @@ public class MenuPanel extends JPanel {
             }
         });
 
-                add(this.twoPlayerBtn);
+        add(this.twoPlayerBtn);
         add(this.fourPlayerBtn);
         add(this.optionsBtn);
         add(this.quitBtn);

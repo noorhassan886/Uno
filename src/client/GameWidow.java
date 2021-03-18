@@ -41,6 +41,7 @@ public class GameWidow extends JFrame {
         this.getContentPane().add(this.game);
         this.validate();
         this.repaint();
+        this.game.initialize();
     }
 
 }

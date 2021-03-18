@@ -15,6 +15,12 @@ public class PlayerHand {
         cards.add(card);
     }
 
+    public ArrayList<UnoCard> getCards() {return this.cards;}
+
+    public void clear() {
+        this.cards.clear();
+    }
+
     @Override
     public String toString() {
         // loop through each card in the hand
