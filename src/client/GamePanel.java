@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class GamePanel extends JPanel {
@@ -49,7 +50,9 @@ public class GamePanel extends JPanel {
                     this.message = this.message.substring("NEW_HAND//".length());
                     String[] cardDescriptions = message.split(",");
                     hand.clear();
-                    // TODO: remove old labels from container
+                    for (JLabel cardLabel : cardLabels) {
+                        remove(cardLabel);
+                    }
                     cardLabels.clear();
                     for(String cardDescription: cardDescriptions) {
                         hand.addCard(UnoCard.fromString(cardDescription));
@@ -88,6 +91,12 @@ public class GamePanel extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     System.out.println("Clicked on " + hand.getCards().get(finalI));
+
+                    try {
+                        ConnectionThread.getServerConnection().send("PLACE_CARD//" + hand.getCards().get(finalI));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             });
         }
@@ -104,4 +113,3 @@ public class GamePanel extends JPanel {
         }
     }
 }
-

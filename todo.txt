@@ -1,0 +1,6 @@
+make the number of cards for each player show up for all players
+make Wild cards work
+make +2 and +4 stack
+call Uno
+Music sounds?
+deck button to draw cards

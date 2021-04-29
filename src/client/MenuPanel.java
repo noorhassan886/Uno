@@ -37,7 +37,7 @@ public class MenuPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    ConnectionThread.getSocketWrapper().send("four");
+                    ConnectionThread.makeServerConnection().send("four");
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

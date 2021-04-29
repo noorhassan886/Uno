@@ -12,7 +12,7 @@ public class ConnectionThread extends Thread{
     private ArrayList<UnoEvent> callbacks;
 
 
-    public static SocketWrapper getSocketWrapper () {
+    public static SocketWrapper getServerConnection () {
         return serverConnection;
     }
 
