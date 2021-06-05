@@ -22,6 +22,11 @@ public class PlayerHand {
     }
 
     public void remove(UnoCard card) {
+        // TODO: if we're removing a Wild - then consider uncolored version
+        if(card instanceof WildCard) {
+            card = new WildCard(card.getInfo());
+        }
+
         // iterate through the list
         for (int i = 0; i < this.cards.size(); i++) {
             // find a match

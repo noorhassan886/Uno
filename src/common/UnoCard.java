@@ -26,7 +26,6 @@ public abstract class UnoCard {
                 BufferedImage image = ImageIO.read(new File("img/large/" + filename.toLowerCase()));
                 map.put(color + " " + i, image);
             }
-
             // Reverse Card
             String filename = color + "_" + "reverse_large.png";
             BufferedImage image = ImageIO.read(new File("img/large/" + filename.toLowerCase()));
@@ -39,14 +38,20 @@ public abstract class UnoCard {
             filename = color + "_" + "+2_large.png";
             image = ImageIO.read(new File("img/large/" + filename.toLowerCase()));
             map.put(color + " +2", image);
+            // Wild +0
+            filename = "wild_+0_" + color + "_large.png";
+            image = ImageIO.read(new File("img/large/" + filename.toLowerCase()));
+            map.put("Wild " + color, image);
+            // Wild +4
+            filename = "wild_+4_" + color + "_large.png";
+            image = ImageIO.read(new File("img/large/" + filename.toLowerCase()));
+            map.put("Wild Draw 4 " + color, image);
         }
-       map.put("Wild", ImageIO.read(new File("img/large/wild_+0_large.png")));
-       map.put("Wild Draw 4", ImageIO.read(new File("img/large/wild_+4_large.png")));
-       map.put("Card Back", ImageIO.read(new File("img/large/card_back_large.png")));
 
-        System.out.println(map.size());
-
-
+        // These null colors represent uncolored Wild cards
+        map.put("Wild null", ImageIO.read(new File("img/large/wild_+0_large.png")));
+        map.put("Wild Draw 4 null", ImageIO.read(new File("img/large/wild_+4_large.png")));
+        map.put("Card Back", ImageIO.read(new File("img/large/card_back_large.png")));
     }
 
     public static BufferedImage getImageForCard(UnoCard card) {return map.get(card.toString());}
@@ -64,10 +69,16 @@ public abstract class UnoCard {
     public static UnoCard fromString(String cardDescription) {
 
         if(cardDescription.startsWith("Wild")) {
-            if (cardDescription.equals("Wild Draw 4")) {
-                return new WildCard("+4");
+            String color = cardDescription.substring(cardDescription.lastIndexOf(" ")+1);
+            WildCard card;
+            if (cardDescription.startsWith("Wild Draw 4")) {
+               card = new WildCard("+4");
+               card.setColor(color.equals("null") ? null : color);
+               return card;
             }
-            return new WildCard("+0");
+                card = new WildCard("+0");
+                card.setColor(color.equals("null") ? null : color);
+                return card;
         }
         String[] pieces = cardDescription.split(" ");
         if(pieces[1].equals("Reverse") || pieces[1].equals("Skip") || pieces[1].equals("+2")) {
@@ -75,7 +86,6 @@ public abstract class UnoCard {
         }
 
         return new RegularCard(pieces[0], Integer.parseInt(pieces[1]));
-
     }
 
     public abstract String getInfo();
@@ -85,7 +95,12 @@ public abstract class UnoCard {
         if(!(other instanceof UnoCard)) return false;
 
         UnoCard card = (UnoCard) other;
-        return this.getInfo().equals(card.getInfo()) && this.getColor().equals(card.getColor());
+        // not equal is type/info is different
+        if(!this.getInfo().equals(card.getInfo())) return false;
+        // if first is null the other is null
+        if(this.getColor() == null) return card.getColor() == null;
+        // colors need to match
+        else return this.getColor().equals(card.getColor());
     }
 
 }

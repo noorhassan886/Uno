@@ -106,9 +106,11 @@ public class Deck {
         // find the top card
         UnoCard topCard = this.getCard();
 
+        if(topCard.getInfo().equals(newCard.getInfo()))
+            return true;
+        if(topCard.getColor() == null) return newCard.getColor() == null;
+        // colors need to match
+        else return topCard.getColor().equals(newCard.getColor());
         // compatible if same color or same number/type
-        return topCard.getColor().equals(newCard.getColor()) ||
-                topCard.getInfo().equals(newCard.getInfo());
     }
-
 }

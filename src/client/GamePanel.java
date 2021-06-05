@@ -2,9 +2,12 @@ package client;
 
 import common.PlayerHand;
 import common.UnoCard;
+import common.WildCard;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -12,24 +15,94 @@ import java.util.ArrayList;
 
 public class GamePanel extends JPanel {
 
-    private final JButton button1, button2;
     private PlayerHand hand;
-    private UnoCard discardPileTopCard;
+    private ArrayList<JLabel> cardLabels;
     private final int SIDE_BUFFER = 100;
     private final int CARD_WIDTH = 100;
     private final int CARD_HEIGHT = 150;
+    private final Container buttonsContainer;
+    private UnoCard discardPileTopCard;
+    private WildCard selectedWild = null;
 //    private JLabel deckButton;
 
-    private ArrayList<JLabel> cardLabels;
+    private boolean choosingColor = false;
+    private JButton[] colorButtons;
 
     public GamePanel() {
-        this.button1 = new JButton("text");
-        this.button2 = new JButton("more text");
+        this.setLayout(null);
         this.hand = new PlayerHand();
         this.cardLabels = new ArrayList<>();
 
-        add(this.button1);
-        add(this.button2);
+        JButton[] colorButtons = new JButton[]{
+                new JButton("Red"),  new JButton("Blue"),
+                new JButton("Yellow"),  new JButton("Green"),
+        };
+        // Create a sub container for the Buttons
+        buttonsContainer = new Container();
+        add(buttonsContainer);
+        // Add the buttons horizontally
+       buttonsContainer.setLayout(new FlowLayout());
+        for (JButton colorButton : colorButtons) {
+            buttonsContainer.add(colorButton);
+            colorButton.setVisible(true);
+        }
+        // Position right above hand of cards
+        buttonsContainer.setBounds(400, 450, 500, 50);
+        buttonsContainer.setVisible(false);
+
+        // TODO: Add click on listener to each button to send a colored Wild Card
+        colorButtons[0].addActionListener(e -> {
+            // Color the currently selected wild
+            selectedWild.setColor("Red");
+            // Send the wild card
+            try {
+                ConnectionThread.getServerConnection().send("PLACE_CARD//" + selectedWild);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            // hide all the buttons
+            selectedWild = null;
+            buttonsContainer.setVisible(false);
+        });
+        colorButtons[1].addActionListener(e -> {
+            // Color the currently selected wild
+            selectedWild.setColor("Blue");
+            // Send the wild card
+            try {
+                ConnectionThread.getServerConnection().send("PLACE_CARD//" + selectedWild);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            // hide all the buttons
+            selectedWild = null;
+            buttonsContainer.setVisible(false);
+        });
+        colorButtons[2].addActionListener(e -> {
+            // Color the currently selected wild
+            selectedWild.setColor("Yellow");
+            // Send the wild card
+            try {
+                ConnectionThread.getServerConnection().send("PLACE_CARD//" + selectedWild);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            // hide all the buttons
+            selectedWild = null;
+            buttonsContainer.setVisible(false);
+        });
+        colorButtons[3].addActionListener(e -> {
+            // Color the currently selected wild
+            selectedWild.setColor("Green");
+            // Send the wild card
+            try {
+                ConnectionThread.getServerConnection().send("PLACE_CARD//" + selectedWild);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            // hide all the buttons
+            selectedWild = null;
+            buttonsContainer.setVisible(false);
+        });
     }
 
     public void initialize() {
@@ -90,12 +163,16 @@ public class GamePanel extends JPanel {
             this.cardLabels.get(i).addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    System.out.println("Clicked on " + hand.getCards().get(finalI));
-
-                    try {
-                        ConnectionThread.getServerConnection().send("PLACE_CARD//" + hand.getCards().get(finalI));
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                    if (hand.getCards().get(finalI) instanceof WildCard) {
+                       buttonsContainer.setVisible(true);
+                       selectedWild = (WildCard) hand.getCards().get(finalI);
+                       repaint();
+                    } else {
+                        try {
+                            ConnectionThread.getServerConnection().send("PLACE_CARD//" + hand.getCards().get(finalI));
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             });
@@ -104,7 +181,6 @@ public class GamePanel extends JPanel {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         if (this.discardPileTopCard != null) {
             g.drawImage(UnoCard.getImageForCard(this.discardPileTopCard), this.getWidth()/2 - CARD_WIDTH/2,
                     this.getHeight()/2 - CARD_HEIGHT/2,

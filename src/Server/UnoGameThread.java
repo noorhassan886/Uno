@@ -45,7 +45,7 @@ public class UnoGameThread extends Thread {
         System.out.println("Starting new two player game");
         // Deal 7 cards per player
         for (PlayerHand hand : this.hands) {
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < 20; i++) {
                 hand.addCard(this.drawFrom.drawCard());
             }
             hand.addCard(UnoCard.fromString("Red +2"));
@@ -153,6 +153,7 @@ public class UnoGameThread extends Thread {
                         // Do nothing for two player game
                     } else if (convertedCard.getInfo().equals("+2")) {
                         plusTwoStacks += 1;
+
                     } else if (convertedCard.getInfo().equals("+4")) {
                         plusFourStacks += 1;
                     }
@@ -185,23 +186,23 @@ public class UnoGameThread extends Thread {
                     for (int i = 0; i < plusTwoStacks; i++) {
                         addCardToPlayer(drawCardFromDeck(), playerTurn);
                         addCardToPlayer(drawCardFromDeck(), playerTurn);
-                        addCardToPlayer(drawCardFromDeck(), playerTurn);
                     }
+                    // Reset num of cards that needs to be drawn
+                    plusTwoStacks = 0;
                 }
             }
 
-            // Reset num of cards that needs to be drawn
-            plusTwoStacks = 0;
         } else {
             // consume the stack if they do not have a +2
-            if (!hands[playerTurn].toString().contains("+2")) {
+            if (!hands[playerTurn].toString().contains("Draw 4")) {
                 // for each stack give them two cards
-                for (int i = 0; i < plusTwoStacks; i++) {
+                for (int i = 0; i < plusFourStacks; i++) {
                     addCardToPlayer(drawCardFromDeck(), playerTurn);
                     addCardToPlayer(drawCardFromDeck(), playerTurn);
                     addCardToPlayer(drawCardFromDeck(), playerTurn);
                     addCardToPlayer(drawCardFromDeck(), playerTurn);
                 }
+                // Reset num of cards that needs to be drawn
                 plusFourStacks = 0;
             }
         }

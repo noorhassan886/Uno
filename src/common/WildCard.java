@@ -13,7 +13,7 @@ public class WildCard extends SpecialCard {
 
         String s = "Wild";
         if(this.type.equals("+4"))
-            s+= " Draw 4";
-        return s;
+            s += " Draw 4";
+        return s + " " + this.color;
     }
 }
