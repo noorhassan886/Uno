@@ -45,7 +45,7 @@ public class UnoGameThread extends Thread {
         System.out.println("Starting new two player game");
         // Deal 7 cards per player
         for (PlayerHand hand : this.hands) {
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 7; i++) {
                 hand.addCard(this.drawFrom.drawCard());
             }
             hand.addCard(UnoCard.fromString("Red +2"));
@@ -174,6 +174,22 @@ public class UnoGameThread extends Thread {
 
             }
 
+            // If someone is trying to draw a card
+            else if(event.getAction().equals("DRAW_CARD")) {
+                if(event.getId() == playerTurn) {
+                    // TODO: only do this if a player does not have a card to place
+                    boolean needsToDraw = true;
+                    for (UnoCard card : hands[playerTurn].getCards()) {
+                        if(canPlaceCard(card, hands[playerTurn])) {
+                            needsToDraw = false;
+                            break;
+                        }
+                    }
+
+                    if(needsToDraw)
+                        addCardToPlayer(drawCardFromDeck(), playerTurn);
+                }
+            }
         }
     }
 

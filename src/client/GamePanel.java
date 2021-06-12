@@ -23,7 +23,7 @@ public class GamePanel extends JPanel {
     private final Container buttonsContainer;
     private UnoCard discardPileTopCard;
     private WildCard selectedWild = null;
-//    private JLabel deckButton;
+    private JLabel deckButton;
 
     private boolean choosingColor = false;
     private JButton[] colorButtons;
@@ -103,16 +103,31 @@ public class GamePanel extends JPanel {
             selectedWild = null;
             buttonsContainer.setVisible(false);
         });
+
+        // Show the deck button
+        deckButton = new JLabel(new ImageIcon(UnoCard.getImageForCard("Card Back")
+                .getScaledInstance(CARD_WIDTH, CARD_HEIGHT, Image.SCALE_SMOOTH)));
+        deckButton.setBounds(
+                1280 / 2 + 8,
+                695 / 2 - CARD_HEIGHT / 2,
+                CARD_WIDTH, CARD_HEIGHT);
+        deckButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    ConnectionThread.getServerConnection().send("DRAW_CARD//kjdhfks");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        deckButton.setVisible(true);
+        add(deckButton);
     }
 
     public void initialize() {
         ConnectionThread connectionThread = ConnectionThread.getConnectionThread();
-//
-//        deckButton = new JLabel(new ImageIcon(UnoCard.getImageForCard("Card Back").getScaledInstance(CARD_WIDTH,CARD_HEIGHT,Image.SCALE_SMOOTH)));
-//        deckButton.setBounds(this.getWidth() / 2 - CARD_WIDTH - 50,
-//                this.getHeight() / 2 - CARD_HEIGHT / 2,
-//                CARD_WIDTH, CARD_HEIGHT);
-//        add(deckButton);
+
 //        repaint();
 
          //Event for when we receive new hand
@@ -182,7 +197,8 @@ public class GamePanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (this.discardPileTopCard != null) {
-            g.drawImage(UnoCard.getImageForCard(this.discardPileTopCard), this.getWidth()/2 - CARD_WIDTH/2,
+            g.drawImage(UnoCard.getImageForCard(this.discardPileTopCard),
+                    this.getWidth() / 2 - CARD_WIDTH - 7,
                     this.getHeight()/2 - CARD_HEIGHT/2,
                     CARD_WIDTH, CARD_HEIGHT, null);
             repaint();
