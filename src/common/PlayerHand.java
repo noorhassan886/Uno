@@ -4,11 +4,14 @@ import java.util.ArrayList;
 
 public class PlayerHand {
 
+    private boolean canCallUno;
+
     // List of Uno cards
     private ArrayList<UnoCard> cards;
 
     public PlayerHand() {
         this.cards = new ArrayList<>();
+        this.canCallUno = false;
     }
 
     public void addCard(UnoCard card) {
@@ -49,5 +52,13 @@ public class PlayerHand {
         }
 
         return handDescription.substring(0, handDescription.length() - 1);
+    }
+
+    public boolean getCanCallUno() {
+        return canCallUno;
+    }
+
+    public void setCanCallUno(boolean canCallUno) {
+        this.canCallUno = canCallUno;
     }
 }

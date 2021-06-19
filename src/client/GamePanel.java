@@ -6,8 +6,6 @@ import common.WildCard;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -23,7 +21,7 @@ public class GamePanel extends JPanel {
     private final Container buttonsContainer;
     private UnoCard discardPileTopCard;
     private WildCard selectedWild = null;
-    private JLabel deckButton;
+    private JLabel deckButton, unoButton;
 
     private boolean choosingColor = false;
     private JButton[] colorButtons;
@@ -40,6 +38,7 @@ public class GamePanel extends JPanel {
         // Create a sub container for the Buttons
         buttonsContainer = new Container();
         add(buttonsContainer);
+
         // Add the buttons horizontally
        buttonsContainer.setLayout(new FlowLayout());
         for (JButton colorButton : colorButtons) {
@@ -54,6 +53,7 @@ public class GamePanel extends JPanel {
         colorButtons[0].addActionListener(e -> {
             // Color the currently selected wild
             selectedWild.setColor("Red");
+
             // Send the wild card
             try {
                 ConnectionThread.getServerConnection().send("PLACE_CARD//" + selectedWild);
@@ -66,6 +66,7 @@ public class GamePanel extends JPanel {
         });
         colorButtons[1].addActionListener(e -> {
             // Color the currently selected wild
+
             selectedWild.setColor("Blue");
             // Send the wild card
             try {
@@ -80,6 +81,7 @@ public class GamePanel extends JPanel {
         colorButtons[2].addActionListener(e -> {
             // Color the currently selected wild
             selectedWild.setColor("Yellow");
+
             // Send the wild card
             try {
                 ConnectionThread.getServerConnection().send("PLACE_CARD//" + selectedWild);
@@ -93,6 +95,7 @@ public class GamePanel extends JPanel {
         colorButtons[3].addActionListener(e -> {
             // Color the currently selected wild
             selectedWild.setColor("Green");
+
             // Send the wild card
             try {
                 ConnectionThread.getServerConnection().send("PLACE_CARD//" + selectedWild);
@@ -123,6 +126,24 @@ public class GamePanel extends JPanel {
         });
         deckButton.setVisible(true);
         add(deckButton);
+
+        // Show the Uno button
+        unoButton = new JLabel(new ImageIcon(UnoCard.getImageForCard("Card Back")
+                .getScaledInstance(CARD_WIDTH / 2, CARD_HEIGHT / 2, Image.SCALE_SMOOTH)));
+        unoButton.setBounds(1200 - CARD_WIDTH / 2 - 20, 20,  CARD_WIDTH / 2, CARD_HEIGHT / 2);
+        unoButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    ConnectionThread.getServerConnection().send("CALL_UNO//kjdhfks");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        unoButton.setVisible(true);
+        add(unoButton);
+
     }
 
     public void initialize() {
@@ -166,7 +187,9 @@ public class GamePanel extends JPanel {
 
     public void initCardLabels() {
         int totalWidth = this.getWidth() - SIDE_BUFFER * 2;
-        int gap = totalWidth / (this.hand.getCards().size() - 1);
+        int gap = this.hand.getCards().size() < 2
+            ? 0
+            : totalWidth / (this.hand.getCards().size() - 1);
         gap = Math.min(gap, 120);
         int neededWidth = gap * (this.hand.getCards().size() - 1);
         int startX = this.getWidth() / 2 - neededWidth / 2;

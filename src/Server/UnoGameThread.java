@@ -48,9 +48,6 @@ public class UnoGameThread extends Thread {
             for (int i = 0; i < 7; i++) {
                 hand.addCard(this.drawFrom.drawCard());
             }
-            hand.addCard(UnoCard.fromString("Red +2"));
-            hand.addCard(UnoCard.fromString("Blue +2"));
-
         }
 
         // Pick a card for the discard pile to start with
@@ -65,6 +62,7 @@ public class UnoGameThread extends Thread {
             try {
                 players[i].send("NEW_HAND//" + hands[i].toString());
                 players[i].send("TOP_CARD//" + this.discardPile.getCard().toString());
+                players[i].send("PLAYER_ID//" + i);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -87,33 +85,17 @@ public class UnoGameThread extends Thread {
                 continue;
             }
 
-            /*
-            TODO:
-                place a card
-                draw a card
-                call uno
-             */
-
             // If someone is trying to place a card
             if (event.getAction().equals("PLACE_CARD")) {
                 // If its the correct players turn
                 if (event.getId() == playerTurn) {
-                 /*
-                TODO:
-                    2. get their card of choice from the event playload
-                    3. validation
-                    4. place card on pile
-                    5. Notify each player the card was placed
-                    6. propagate effects onto next player
-                 */
-
                     String card = event.getPayload();
                     // Convert "card" to an Uno Card
                     UnoCard convertedCard = UnoCard.fromString(card);
 
                     // Validate if card can be placed
-                    // TODO: Make one card validation method for
-                    //  base Uno Compatibility and special card stacking rules
+                    // Make one card validation method for
+                    // base Uno Compatibility and special card stacking rules
 
                     boolean canBePlaced = canPlaceCard(convertedCard, hands[event.getId()]);
 
@@ -131,6 +113,11 @@ public class UnoGameThread extends Thread {
                         } catch (IOException e) {
                             System.out.println("Error sending updated hand to player " + e.getMessage());
                         }
+                        broadcastHandSizes();
+
+                        // potentially make that person uno-able
+                        if(this.hands[playerTurn].getCards().size() == 1)
+                            this.hands[playerTurn].setCanCallUno(true);
 
                         // tell all players abt new top card
                         for (SocketWrapper player : players) {
@@ -158,8 +145,7 @@ public class UnoGameThread extends Thread {
                         plusFourStacks += 1;
                     }
 
-//                    wild color picking;
-
+                    // wild color picking;
                     // Increment current players turn
                     if (direction.equals("cw")) {
                         playerTurn = (playerTurn + 1) % players.length;
@@ -169,7 +155,6 @@ public class UnoGameThread extends Thread {
 
                     // Handing stacking cards
                     handleCardStacks();
-                    // TODO: ensure it knows the diff between +2 and +4 stacks
                 }
 
             }
@@ -177,7 +162,7 @@ public class UnoGameThread extends Thread {
             // If someone is trying to draw a card
             else if(event.getAction().equals("DRAW_CARD")) {
                 if(event.getId() == playerTurn) {
-                    // TODO: only do this if a player does not have a card to place
+                    // only do this if a player does not have a card to place
                     boolean needsToDraw = true;
                     for (UnoCard card : hands[playerTurn].getCards()) {
                         if(canPlaceCard(card, hands[playerTurn])) {
@@ -188,6 +173,34 @@ public class UnoGameThread extends Thread {
 
                     if(needsToDraw)
                         addCardToPlayer(drawCardFromDeck(), playerTurn);
+                }
+            }
+
+            // If someone calls Uno
+            else if (event.getAction().equals("CALL_UNO")) {
+                boolean checkingSomeoneElse = false;
+                for (int i = 0; i < hands.length; i++) {
+                    if (i != event.getId()) {
+                        if (hands[i].getCanCallUno()) {
+                            System.out.println("PLayer " + event.getId() + " calls Uno on player " + i);
+                            checkingSomeoneElse = true;
+                            hands[i].setCanCallUno(false);
+                            for (int j = 0; j < 4; j++) {
+                                addCardToPlayer(drawFrom.drawCard(), i);
+                            }
+                        }
+                    }
+                }
+                boolean savedSelf = hands[event.getId()].getCanCallUno();
+                if(hands[event.getId()].getCanCallUno()) {
+                    hands[event.getId()].setCanCallUno(false);
+                    System.out.println("Player " + event.getId() + " saved themselves");
+                }
+
+                if (checkingSomeoneElse && !savedSelf) {
+                    for (int j = 0; j < 4; j++) {
+                        addCardToPlayer(drawFrom.drawCard(), event.getId());
+                    }
                 }
             }
         }
@@ -224,17 +237,18 @@ public class UnoGameThread extends Thread {
         }
     }
 
-
     private void addCardToPlayer(UnoCard card, int playerTurn) {
         // Add card to server copy of hand
         hands[playerTurn].addCard(card);
+        // That player cannot call Uno
+        hands[playerTurn].setCanCallUno(false);
         // Tell player their new hand
         try {
             players[playerTurn].send("NEW_HAND//" + hands[playerTurn].toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO: tell all players of number of cards of this player
+        broadcastHandSizes();
     }
 
     private UnoCard drawCardFromDeck() {
@@ -270,6 +284,23 @@ public class UnoGameThread extends Thread {
             return match.getInfo().equals(currentCard.getInfo());
         } else {
             return match.equals(currentCard);
+        }
+    }
+
+    private void broadcastHandSizes() {
+        StringBuilder payload = new StringBuilder();
+        for (PlayerHand hand : this.hands) {
+            payload.append(hand.getCards().size());
+            payload.append(',');
+        }
+        payload.deleteCharAt(payload.length()-1);
+
+        try {
+            for (SocketWrapper player : players) {
+                player.send("DISPLAYING_PLAYER_HANDS//" + payload);
+            }
+        } catch (IOException e) {
+            System.out.println("Error sending updated hand to player " + e.getMessage());
         }
     }
 }
