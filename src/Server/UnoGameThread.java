@@ -67,6 +67,7 @@ public class UnoGameThread extends Thread {
                 e.printStackTrace();
             }
         }
+        broadcastHandSizes();
 
         //  Begin listening to players
         final BlockingQueue<PlayerEvent> messageQueue = new LinkedBlockingQueue<>();
@@ -293,7 +294,7 @@ public class UnoGameThread extends Thread {
             payload.append(hand.getCards().size());
             payload.append(',');
         }
-        payload.deleteCharAt(payload.length()-1);
+        payload.deleteCharAt(payload.length() - 1);
 
         try {
             for (SocketWrapper player : players) {

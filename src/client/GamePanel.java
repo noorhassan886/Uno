@@ -22,6 +22,8 @@ public class GamePanel extends JPanel {
     private UnoCard discardPileTopCard;
     private WildCard selectedWild = null;
     private JLabel deckButton, unoButton;
+    private int id;
+    private int[] handsizes;
 
     private boolean choosingColor = false;
     private JButton[] colorButtons;
@@ -49,7 +51,7 @@ public class GamePanel extends JPanel {
         buttonsContainer.setBounds(400, 450, 500, 50);
         buttonsContainer.setVisible(false);
 
-        // TODO: Add click on listener to each button to send a colored Wild Card
+        // Add click on listener to each button to send a colored Wild Card
         colorButtons[0].addActionListener(e -> {
             // Color the currently selected wild
             selectedWild.setColor("Red");
@@ -183,6 +185,36 @@ public class GamePanel extends JPanel {
                 }
             }
         });
+        connectionThread.subscribe(new UnoEvent() {
+            @Override
+            public void run() {
+                if(this.message.startsWith("PLAYER_ID//")) {
+                    id = Integer.parseInt(this.message.split("//")[1]);
+                    System.out.println("id = " + id);
+                }
+            }
+        });
+        connectionThread.subscribe(new UnoEvent() {
+            @Override
+            public void run() {
+                if(this.message.startsWith("DISPLAYING_PLAYER_HANDS")) {
+                    String payload = this.message.split("//")[1];
+                    String[] sizes = payload.split(",");
+
+                    int currentHand = 0;
+                    handsizes = new int[sizes.length - 1];
+                    for (int i = 0; i < sizes.length; i++) {
+                        if (currentHand != id) {
+                            handsizes[currentHand] = Integer.parseInt(sizes[i]);
+                            currentHand++;
+                        }
+                    }
+
+                    System.out.println("handsizes = " + handsizes);
+                    repaint();
+                }
+            }
+        });
     }
 
     public void initCardLabels() {
@@ -222,9 +254,28 @@ public class GamePanel extends JPanel {
         if (this.discardPileTopCard != null) {
             g.drawImage(UnoCard.getImageForCard(this.discardPileTopCard),
                     this.getWidth() / 2 - CARD_WIDTH - 7,
-                    this.getHeight()/2 - CARD_HEIGHT/2,
+                    this.getHeight() / 2 - CARD_HEIGHT/2,
                     CARD_WIDTH, CARD_HEIGHT, null);
-            repaint();
+        }
+
+        if (this.handsizes != null) {
+            if (this.handsizes.length == 1) {
+                // TODO: Draw handSizes[0] card on the left of the screen
+                int totalWidth = this.getWidth() - SIDE_BUFFER * 2;
+                int gap = this.handsizes[0] < 2
+                        ? 0
+                        : totalWidth / (this.handsizes[0] - 1);
+                gap = Math.min(gap, 120);
+                int neededWidth = gap * (this.handsizes[0] - 1);
+                int startX = this.getWidth() / 2 - neededWidth / 2;
+                for (int i = 0; i < this.handsizes[0]; i++) {
+                    g.drawImage(UnoCard.getImageForCard("Card Back"), startX + gap * i - CARD_WIDTH / 2, 50,
+                            CARD_WIDTH, CARD_HEIGHT, null);
+                }
+                // TODO: Draw handSizes[0] card on the top of the screen
+                // TODO: Draw handSizes[0] card on the right of the screen
+
+            }
         }
     }
 }
