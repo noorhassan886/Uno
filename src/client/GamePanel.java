@@ -260,7 +260,6 @@ public class GamePanel extends JPanel {
 
         if (this.handsizes != null) {
             if (this.handsizes.length == 1) {
-                // TODO: Draw handSizes[0] card on the left of the screen
                 int totalWidth = this.getWidth() - SIDE_BUFFER * 2;
                 int gap = this.handsizes[0] < 2
                         ? 0
@@ -269,13 +268,55 @@ public class GamePanel extends JPanel {
                 int neededWidth = gap * (this.handsizes[0] - 1);
                 int startX = this.getWidth() / 2 - neededWidth / 2;
                 for (int i = 0; i < this.handsizes[0]; i++) {
-                    g.drawImage(UnoCard.getImageForCard("Card Back"), startX + gap * i - CARD_WIDTH / 2, 50,
+                    g.drawImage(UnoCard.getImageForCard("Card Back"),
+                            startX + gap * i - CARD_WIDTH / 2, 50,
                             CARD_WIDTH, CARD_HEIGHT, null);
                 }
-                // TODO: Draw handSizes[0] card on the top of the screen
-                // TODO: Draw handSizes[0] card on the right of the screen
+            } else {
+                // TODO: Draw handSizes[1] card on the top of the screen
+                int totalWidth = this.getWidth() - SIDE_BUFFER * 2;
+                int gap = this.handsizes[1] < 2
+                        ? 0
+                        : totalWidth / (this.handsizes[1] - 1);
+                gap = Math.min(gap, 120);
+                int neededWidth = gap * (this.handsizes[1] - 1);
+                int startX = this.getWidth() / 2 - neededWidth / 2;
+                for (int i = 0; i < this.handsizes[1]; i++) {
+                    g.drawImage(UnoCard.getImageForCard("Card Back"),
+                            startX + gap * i - CARD_WIDTH / 2, 50,
+                            CARD_WIDTH, CARD_HEIGHT, null);
+                }
+
+                // TODO: Draw handSizes[0] card on the left of the screen
+                // TODO: Draw handSizes[2] card on the right of the screen
+                int totalHeight = this.getHeight() - SIDE_BUFFER * 2;
+                gap = this.handsizes[0] < 2
+                        ? 0
+                        : totalHeight / (this.handsizes[0] - 1);
+                gap = Math.min(gap, 120);
+                int neededHeight = gap * (this.handsizes[0] - 1);
+                int startY = this.getHeight() / 2 - neededHeight / 2;
+                for (int i = 0; i < this.handsizes[0]; i++) {
+                    g.drawImage(UnoCard.getImageForCard("Card Back"),
+                            SIDE_BUFFER, startY + gap * i - CARD_HEIGHT / 2,
+                            CARD_WIDTH, CARD_HEIGHT, null);
+                }
+                gap = this.handsizes[2] < 2
+                        ? 0
+                        : totalHeight / (this.handsizes[2] - 1);
+                gap = Math.min(gap, 120);
+                neededHeight = gap * (this.handsizes[2] - 1);
+                startY = this.getHeight() / 2 - neededHeight / 2;
+                for (int i = 0; i < this.handsizes[2]; i++) {
+                    g.drawImage(UnoCard.getImageForCard("Card Back"),
+                            this.getWidth() - SIDE_BUFFER - CARD_WIDTH, startY + gap * i - CARD_HEIGHT / 2,
+                            CARD_WIDTH, CARD_HEIGHT, null);
+                }
 
             }
+
         }
+
     }
+
 }

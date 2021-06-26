@@ -77,7 +77,7 @@ public class UnoGameThread extends Thread {
             listeningThreads[i].start();
         }
 
-        while (true /* as long as the game is going */) {
+        while (!hasGameEnded()) {
             PlayerEvent event = null;
             try {
                 event = messageQueue.take();
@@ -171,7 +171,6 @@ public class UnoGameThread extends Thread {
                             break;
                         }
                     }
-
                     if(needsToDraw)
                         addCardToPlayer(drawCardFromDeck(), playerTurn);
                 }
@@ -205,6 +204,13 @@ public class UnoGameThread extends Thread {
                 }
             }
         }
+    }
+    private boolean hasGameEnded() {
+        for (PlayerHand hand : hands) {
+            if (hand.getCards().size() == 0)
+                return true;
+        }
+        return false;
     }
 
     private void handleCardStacks() {

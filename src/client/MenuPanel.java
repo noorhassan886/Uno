@@ -38,6 +38,7 @@ public class MenuPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 try {
                     ConnectionThread.makeServerConnection().send("four");
+                    moveToGamePanel.actionPerformed(e);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
