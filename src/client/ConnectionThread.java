@@ -19,7 +19,7 @@ public class ConnectionThread extends Thread{
     public static SocketWrapper makeServerConnection () {
         if (serverConnection == null) {
             try {
-                serverConnection = new SocketWrapper(new Socket("localhost", 5000));
+                serverConnection = new SocketWrapper(new Socket("34.68.106.60", 5000));
                 connectionThread = new ConnectionThread();
                 connectionThread.start();
             } catch (IOException e) {
